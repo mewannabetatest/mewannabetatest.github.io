@@ -20,7 +20,6 @@ function applyIps(bsmc, bips)
 		 && bips[i+1]==79
 		 && bips[i+2]==70)
 		{
-			console.log("EOF triggered");
 			ipsvalid = true;
 			break;
 		}

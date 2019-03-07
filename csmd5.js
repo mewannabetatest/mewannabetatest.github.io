@@ -132,11 +132,17 @@ function checksum(bin)
 	}
 
 	// Generate string of hash, and return
+	function tolendian(n)
+	{
+		var s = (n>>>0).toString(16);
+		while(s.length<8) s = "0"+s;
+		return s;
+	}
 	var r = "";
-	r+= (d0>>>0).toString(16);
-	r+= (c0>>>0).toString(16);
-	r+= (b0>>>0).toString(16);
-	r+= (a0>>>0).toString(16);
+	r+= tolendian(d0);
+	r+= tolendian(c0);
+	r+= tolendian(b0);
+	r+= tolendian(a0);
 	var rl = r.length;
 	var r2 = "";
 	for(i=0;i<rl;i+=2) r2+= r[rl-i-2]+r[rl-i-1];
