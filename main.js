@@ -10,9 +10,14 @@ function main(div)
 	div.appendChild(document.createTextNode("Upload a headered or unheadered FF3 .smc to get started"));
 	div.appendChild(document.createElement("br"));
 	div.appendChild(document.createElement("br"));
-	div.appendChild(document.createTextNode("NOTE: ONLY WORKS WITH 1.0 UNHEADERED ATM- if you're seeing this, you probably saw me posting about this on discord:"));
+	div.appendChild(document.createTextNode("NOTE: ONLY WORKS WITH 1.0 HEADERED ATM- if you're seeing this, you probably saw me posting about this on discord:"));
 	div.appendChild(document.createElement("br"));
-	div.appendChild(document.createTextNode("if you could run the sum checker (TODO LINK) and PM me the result, I'll be able to get this to work for your rom, thanks!"));
+	div.appendChild(document.createTextNode("if you could run the sum checker ( "));
+	var a = document.createElement("a");
+	a.innerHTML = "https://mewannabetatest.github.io/checksum/index.html";
+	a.href = "https://mewannabetatest.github.io/checksum/index.html";
+	div.appendChild(a);
+	div.appendChild(document.createTextNode(" ) and PM me the result, I'll be able to get this to work for your rom, thanks!"));
 
 	// File loader & status text
 	var loadBut = document.createElement("input");
