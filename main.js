@@ -1,6 +1,5 @@
 "use strict";
 
-
 function main(div)
 {
 
@@ -8,16 +7,6 @@ function main(div)
 
 	// Top Text
 	div.appendChild(document.createTextNode("Upload a headered or unheadered FF3 .smc to get started"));
-	div.appendChild(document.createElement("br"));
-	div.appendChild(document.createElement("br"));
-	div.appendChild(document.createTextNode("NOTE: ONLY WORKS WITH 1.0 HEADERED ATM- if you're seeing this, you probably saw me posting about this on discord:"));
-	div.appendChild(document.createElement("br"));
-	div.appendChild(document.createTextNode("if you could run the sum checker ( "));
-	var a = document.createElement("a");
-	a.innerHTML = "https://mewannabetatest.github.io/checksum/index.html";
-	a.href = "https://mewannabetatest.github.io/checksum/index.html";
-	div.appendChild(a);
-	div.appendChild(document.createTextNode(" ) and PM me the result, I'll be able to get this to work for your rom, thanks!"));
 
 	// File loader & status text
 	var loadBut = document.createElement("input");
@@ -41,25 +30,28 @@ function main(div)
 		{
 			// Compute checksum & version
 			var bsmc = new Uint8Array(e.target.result);
+			if(bsmc.length==3146240) for(var i=0;i<512;i++) bsmc[i] = 0; // nullify header
 			var cs = checksum(bsmc);
-			var hr = cs=="4cdfc79b44cd6d532dc6631a5c762094"
-			      || cs=="GET ME!!";
-			var ur = cs=="GET ME"
-		          || cs=="GET ME!!";
+			var hr10 = cs=="7161afb7730f462cb713f8380ca6e4ab";
+			var hr11 = cs=="ef1de04ca2f61e88b77fa0f101c914da";
+			var ur10 = cs=="d7286f401a4c85ec726e96c16a76a7af";
+		    var ur11 = cs=="190f710302a701521ab2eee26c2f953f";
 
 			// Display autodetect result (and stop if rom invalid)
-			if(hr)      textDiv.innerHTML = "FF3 (headered) Detected";
-			else if(ur) textDiv.innerHTML = "FF3 (unheadered) Detected";
+			if(hr10)      textDiv.innerHTML = "FF3 1.0 (headered) Detected";
+			else if(hr11) textDiv.innerHTML = "FF3 1.1 (headered) Detected";
+			else if(ur10) textDiv.innerHTML = "FF3 1.0 (unheadered) Detected";
+			else if(ur11) textDiv.innerHTML = "FF3 1.1 (unheadered) Detected";
 			else
 			{
-				textDiv.innerHTML = "Invalid ROM.  Make sure you're uploading an unpatched rom of Final Fantasy 3 (the US edition; 1.0 or 1.1 will both work)";
+				textDiv.innerHTML = "Invalid ROM.  Make sure you're uploading a clean unpatched rom of Final Fantasy 3 US edition, versions 1.0 or 1.1.  If you've got a zip file, extract the .smc file and upload that.";
 				applyBut.disabled = true;
 				downloadDiv.innerHTML = "";
 				return;
 			}
 
 			// Activate Apply button, with appropriate data
-			activateApplyBut(bsmc, hr);
+			activateApplyBut(bsmc, hr10||hr11);
 
 		};
 		reader.readAsArrayBuffer(file);
@@ -82,9 +74,13 @@ function main(div)
 				if(ab)
 				{
 					var bips = new Uint8Array(ab);
-					console.log(bips)
-					if(applyIps(bsmc, bips)) genDownloadBut(bsmc);
+					if(applyIps(bsmc, bips)) genDownloadBut(bsmc, headered);
 					else alert("FUUUUCK some shit got fucked up"); //TODO
+					if(headered) var sum = "763bff2a49d97f56e9a8faceedb1d665";
+					else         var sum = "dc33e2191452f967011ce4023b44ca9b";
+					if(checksum(bsmc)==sum) textDiv.innerHTML = "Patching complete!";
+					else textDiv.innerHTML = "Checksum didn't match... you can try downloading the file but it might not work.  This shouldn't have happened: please shoot me a PM on ngplus or discord so I can figure out what went wrong."
+
 				}
 				else console.log("FUUUUUUUUUCK"); // TODO
 			};
@@ -108,17 +104,17 @@ function main(div)
 	div.appendChild(downloadDiv)
 	function genDownloadBut(bsmc)
 	{
+		downloadDiv.innerHTML = "";
 		var downloadAnc = document.createElement("a");
-		downloadAnc.style.width = "70px";
+		downloadAnc.href = "";
 		downloadAnc.style.backgroundColor = "#dfd";
-		downloadAnc.style.fontColor = "#000";
-		downloadAnc.innerHTML = "Patch complete! Click here to download";
+		downloadAnc.style.border = "1px solid #888";
+		downloadAnc.style.padding = "5px";
+		downloadAnc.innerHTML = "Click here to download";
 		downloadDiv.appendChild(downloadAnc);
 		downloadDiv.addEventListener("mousedown", function() // TODO is mousedown ghetto here??
 		{
 			var blob = new Blob([bsmc], { type: "mimeString"});
-
-			// TODO add checksums on final ROMs, to make sure they really patched properly
 
 			var url = URL.createObjectURL(blob);
 			downloadAnc.download = "BNW190.smc";
