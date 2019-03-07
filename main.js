@@ -1,5 +1,7 @@
 "use strict";
 
+// TODO when a new file's uploaded, clear the download div
+
 function main(div)
 {
 
@@ -34,8 +36,8 @@ function main(div)
 			var cs = checksum(bsmc);
 			var hr10 = cs=="7161afb7730f462cb713f8380ca6e4ab";
 			var hr11 = cs=="ef1de04ca2f61e88b77fa0f101c914da";
-			var ur10 = cs=="d7286f401a4c85ec726e96c16a76a7af";
-		    var ur11 = cs=="190f710302a701521ab2eee26c2f953f";
+			var ur10 = cs=="e986575b98300f721ce27c180264d890";
+		    var ur11 = cs=="544311e104805e926083acf29ec664da";
 
 			// Display autodetect result (and stop if rom invalid)
 			if(hr10)      textDiv.innerHTML = "FF3 1.0 (headered) Detected";
@@ -52,6 +54,7 @@ function main(div)
 
 			// Activate Apply button, with appropriate data
 			activateApplyBut(bsmc, hr10||hr11);
+			downloadDiv.innerHTML = "";
 
 		};
 		reader.readAsArrayBuffer(file);
@@ -77,7 +80,7 @@ function main(div)
 					if(applyIps(bsmc, bips)) genDownloadBut(bsmc, headered);
 					else alert("FUUUUCK some shit got fucked up"); //TODO
 					if(headered) var sum = "763bff2a49d97f56e9a8faceedb1d665";
-					else         var sum = "dc33e2191452f967011ce4023b44ca9b";
+					else         var sum = "54427dfadea94ef32acd77be78137ac5";
 					if(checksum(bsmc)==sum) textDiv.innerHTML = "Patching complete!";
 					else textDiv.innerHTML = "Checksum didn't match... you can try downloading the file but it might not work.  This shouldn't have happened: please shoot me a PM on ngplus or discord so I can figure out what went wrong."
 
@@ -109,6 +112,7 @@ function main(div)
 		downloadAnc.href = "";
 		downloadAnc.style.backgroundColor = "#dfd";
 		downloadAnc.style.border = "1px solid #888";
+		downloadAnc.style.borderRadius = "5px";
 		downloadAnc.style.padding = "5px";
 		downloadAnc.innerHTML = "Click here to download";
 		downloadDiv.appendChild(downloadAnc);
