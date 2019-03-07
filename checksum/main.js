@@ -24,7 +24,7 @@ function main(div)
 		{
 			var bsmc = new Uint8Array(e.target.result);
 			var cs = checksum(bsmc);
-			out.innerHTML = cs;
+			out.innerHTML = "Checksum: "+cs+"<br/>Filesize: "+bsmc.length+" bytes";
 		};
 		reader1.readAsArrayBuffer(file1);
 
