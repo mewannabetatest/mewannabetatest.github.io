@@ -6,7 +6,7 @@ function main(div)
 	div.style.fontFamily = "monospace";
 
 	// Top Text
-	div.appendChild(document.createTextNode("Upload a headered or unheadered FF3 .smc to get started"));
+	div.appendChild(document.createTextNode("Upload a headered or unheadered FF3 ROM (.smc, .sfc, or .zip)"));
 
 	// File loader & status text
 	var loadBut = document.createElement("input");
