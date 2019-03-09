@@ -41,7 +41,7 @@ function main(div)
 			// Get smc content
 			if(ext=="zip")
 			{
-				textDiv.innerHTML = "Examing zip contents...";
+				textDiv.innerHTML = "Examining zip contents...";
 
 				// Load zip, then check it's contents
 				JSZip.loadAsync(file).then(function(z)
