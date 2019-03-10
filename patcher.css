@@ -8,8 +8,8 @@ patcherContainer (The div which all subsequent elements are appended to)
  patcherLoadInput (the "Browse" file selection input)
  patcherOutputText  (Div that patcher output text is printed to)
  patcherApplyButton (The "Apply Patch" button)
- patcherDownloadAncDiv (The div holding the download anchor)
-  patcherDownloadAnchor (The "Click here to Download" anchor)
+ patcherSaveAncDiv (The div holding the save anchor)
+  patcherSaveAnchor (The "Click here to Save" anchor)
 
 */
 
@@ -53,14 +53,14 @@ patcherContainer (The div which all subsequent elements are appended to)
 }
 
 
-.patcherDownloadAncDiv /* The div holding the download anchor */
+.patcherSaveAncDiv /* The div holding the save anchor */
 {
-	height: 30px; /* Constant height, so adding the Download Anchor doesn't change div's height */
+	height: 30px; /* Constant height, so adding the Save Anchor doesn't change div's height */
 	margin-top: 20px;
 }
 
 
-.patcherDownloadAnchor /* The "Click here to Download" button */
+.patcherSaveAnchor /* The "Click here to Save" button */
 {
 	/* Note: This is actually an "a" element, not a "button" element */
 

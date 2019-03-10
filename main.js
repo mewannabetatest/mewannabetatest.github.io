@@ -69,7 +69,7 @@ function main(outerDiv)
 								if(needlesswaits<=0)
 								{
 									applyBut.disabled = true;
-									downloadDiv.innerHTML = "";
+									saveDiv.innerHTML = "";
 									textDiv.innerHTML = ".zip does not contain a valid FF3 rom.  "+failhelp;
 								}
 							}
@@ -94,7 +94,7 @@ function main(outerDiv)
 				{
 					textDiv.innerHTML = "Invalid ROM.  "+failhelp;
 					applyBut.disabled = true;
-					downloadDiv.innerHTML = "";
+					saveDiv.innerHTML = "";
 				}
 
 			}
@@ -122,7 +122,7 @@ function main(outerDiv)
 				// Activate Apply button
 				var isheadered = (version=="h10")||(version=="h11");
 				activateApplyBut(bsmc, isheadered);
-				downloadDiv.innerHTML = "";
+				saveDiv.innerHTML = "";
 			}
 
 		};
@@ -131,7 +131,7 @@ function main(outerDiv)
 	});
 
 
-	// GAME TEXT DROPDOWN TODO
+	// Game Text Dropdown
 	var gameTextSelect = document.createElement("select");
 	gameTextSelect.className = "patcherGameTextSelect";
 	(function()
@@ -150,6 +150,7 @@ function main(outerDiv)
 		div.appendChild(gameTextSelect);
 		// TODO on hover, have text explaining what the difference is
 		// TODO make name stylable... and it's options too? look up styling selects
+		// TODO on value change, make it reset? might be a pain in the ass though...
 	})();
 
 
@@ -204,9 +205,9 @@ function main(outerDiv)
 				{
 					try
 					{
-						if(warn) textDiv.innerHTML = "Checksum didn't match; you can try downloading the file but it might not work.  This shouldn't have happened..."
+						if(warn) textDiv.innerHTML = "Checksum didn't match; you can try saving the file but it might not work.  This shouldn't have happened..."
 						else     textDiv.innerHTML = "Patching complete!  DON'T LOAD THE ZIP DIRECTLY IN YOUR EMULATOR, it probably won't work!  Extract all the files from the zip, and load the .smc file in your emulator.";
-						genDownloadBut(content);
+						genSaveBut(content);
 					}
 					catch(e){ console.log(e);}
 				});
@@ -264,23 +265,23 @@ function main(outerDiv)
 	}
 
 
-	// Download Button
-	var downloadDiv = document.createElement("div");
-	downloadDiv.className = "patcherDownloadAncDiv";
-	div.appendChild(downloadDiv)
-	function genDownloadBut(blob)
+	// Save Button
+	var saveDiv = document.createElement("div");
+	saveDiv.className = "patcherSaveAncDiv";
+	div.appendChild(saveDiv)
+	function genSaveBut(blob)
 	{
-		downloadDiv.innerHTML = "";
-		var downloadAnc = document.createElement("a");
-		downloadAnc.className = "patcherDownloadAnchor";
-		downloadAnc.href = "";
-		downloadAnc.innerHTML = "Click here to download";
-		downloadDiv.appendChild(downloadAnc);
-		downloadDiv.addEventListener("mousedown", function() // TODO is mousedown ghetto here??
+		saveDiv.innerHTML = "";
+		var saveAnc = document.createElement("a");
+		saveAnc.className = "patcherSaveAnchor";
+		saveAnc.href = "";
+		saveAnc.innerHTML = "Click here to save";
+		saveDiv.appendChild(saveAnc);
+		saveDiv.addEventListener("mousedown", function() // TODO is mousedown ghetto here??
 		{
 			var url = URL.createObjectURL(blob);
-			downloadAnc.download = "BNW190.zip";
-			downloadAnc.href = url;
+			saveAnc.download = "BNW190.zip";
+			saveAnc.href = url;
 		});
 	}
 
