@@ -7,10 +7,14 @@ function main(outerDiv)
 	div.className = "patcherContainer";
 
 	// File loader
+	var loadDiv = document.createElement("div");
+	loadDiv.className = "patcherLoadDiv";
 	var loadBut = document.createElement("input");
 	loadBut.className = "patcherLoadInput";
 	loadBut.type = "file";
-	div.appendChild(loadBut);
+	loadDiv.appendChild(document.createTextNode("FF3 ROM: "));
+	loadDiv.appendChild(loadBut);
+	div.appendChild(loadDiv);
 	loadBut.addEventListener("change", function(e)
 	{
 		// Get file
@@ -40,8 +44,7 @@ function main(outerDiv)
 				JSZip.loadAsync(file).then(function(z)
 				{try{
 
-					//  ... god I fucking hate jszip so much
-					var needlesswaits = 0;
+					var waits = 0;
 					z.forEach(function(relativePath, zipEntry)
 					{
 						// Get file's extension
@@ -51,8 +54,7 @@ function main(outerDiv)
 						if(e!="smc"&&e!="sfc") return;
 
 						// Get binary for zip entry
-						// ... I mean I reeaaaaaally fucking hate jszip
-						needlesswaits++;
+						waits++;
 						zipEntry.async("uint8Array").then(function(bin)
 						{try{
 
@@ -65,8 +67,8 @@ function main(outerDiv)
 							}
 							else
 							{
-								needlesswaits--;
-								if(needlesswaits<=0)
+								waits--;
+								if(waits<=0)
 								{
 									applyBut.disabled = true;
 									saveDiv.innerHTML = "";
@@ -131,9 +133,14 @@ function main(outerDiv)
 	});
 
 
-	// Game Text Dropdown
-	var gameTextSelect = document.createElement("select");
-	gameTextSelect.className = "patcherGameTextSelect";
+	// Dialogue Selection Dropdown
+	var dialogueDiv = document.createElement("div");
+	dialogueDiv.className = "patcherDialogueDiv";
+	var dialogueSelect = document.createElement("select");
+	dialogueSelect.className = "patcherDialogueSelect";
+	dialogueDiv.appendChild(document.createTextNode("Dialogue Patch: "));
+	dialogueDiv.appendChild(dialogueSelect);
+	div.appendChild(dialogueDiv);
 	(function()
 	{
 		function addOption(val, text)
@@ -141,16 +148,13 @@ function main(outerDiv)
 			var o = document.createElement("option");
 			o.value = val;
 			o.appendChild(document.createTextNode(text));
-			gameTextSelect.appendChild(o);
+			dialogueSelect.appendChild(o);
 		}
 
 		addOption("normal", "Brave New World");
 		addOption("clean", "Clean New World");
 		//addOption("vanilla", "Original Text");
-		div.appendChild(gameTextSelect);
-		// TODO on hover, have text explaining what the difference is
-		// TODO make name stylable... and it's options too? look up styling selects
-		// TODO on value change, make it reset? might be a pain in the ass though...
+
 	})();
 
 
@@ -170,6 +174,7 @@ function main(outerDiv)
 	function activateApplyBut(bsmc, headered)
 	{
 		applyBut.disabled = false;
+		dialogueSelect.disabled = false;
 
 		function makereq(filename, func)
 		{
@@ -191,10 +196,17 @@ function main(outerDiv)
 			var rmfn = "Readme.txt";
 			var pmfn = "Printme.xls";
 			var umfn = "Unlockme.rar";
+			var brm = null;
+			var bpm = null;
+			var bum = null;
 			textDiv.innerHTML = "Downloading and zipping files...";
-			makereq("attachments/"+rmfn,function(brm){ // TODO make these dl concurrently?
-			makereq("attachments/"+pmfn,function(bpm){ //  or dl these in advance??
-			makereq("attachments/"+umfn,function(bum)
+
+			function checkdone(){ if(brm&&bpm&&bum) makezip(); }
+			makereq("attachments/"+rmfn,function(bin){ brm = bin; checkdone(); });
+			makereq("attachments/"+pmfn,function(bin){ bpm = bin; checkdone(); });
+			makereq("attachments/"+umfn,function(bin){ bum = bin; checkdone(); });
+
+			function makezip()
 			{
 				var z = new JSZip();
 				z.file("BNW190.smc", bsmc);
@@ -212,12 +224,14 @@ function main(outerDiv)
 					catch(e){ console.log(e);}
 				});
 
-			})})}); // TODO herp derp
+			}
+
 		}
 
 		applyBut.onclick = function()
 		{
 			applyBut.disabled = true;
+			dialogueSelect.disabled = true;
 			textDiv.innerHTML = "Downloading and Applying patch...";
 			var ipsfilename = headered?"patches/bnwh190.ips":"patches/bnwu190.ips";
 			makereq(ipsfilename, function(bips)
@@ -236,10 +250,8 @@ function main(outerDiv)
 				if(checksum(bsmc)!=sum) warn = true;
 
 				// Apply Clean New World if toggled, then Zip
-				console.log(gameTextSelect.value)
-				if(gameTextSelect.value=="clean")
+				if(dialogueSelect.value=="clean")
 				{
-					applyBut.disabled = true;
 					textDiv.innerHTML = "Downloading and Applying Clean New World...";
 					var ipsfilename = headered?"patches/cnwh190.ips":"patches/cnwu190.ips";
 					makereq(ipsfilename, function(bips)
@@ -274,15 +286,10 @@ function main(outerDiv)
 		saveDiv.innerHTML = "";
 		var saveAnc = document.createElement("a");
 		saveAnc.className = "patcherSaveAnchor";
-		saveAnc.href = "";
 		saveAnc.innerHTML = "Click here to save";
+		saveAnc.download = "BNW190.zip";
+		saveAnc.href = URL.createObjectURL(blob);
 		saveDiv.appendChild(saveAnc);
-		saveDiv.addEventListener("mousedown", function() // TODO is mousedown ghetto here??
-		{
-			var url = URL.createObjectURL(blob);
-			saveAnc.download = "BNW190.zip";
-			saveAnc.href = url;
-		});
 	}
 
 	// Append to DOM

@@ -4,12 +4,15 @@ DOM structure:
 The "main" function injects this DOM structure into the element it's
  passed, in the following order:
 
-patcherContainer (The div which all subsequent elements are appended to)
- patcherLoadInput (the "Browse" file selection input)
- patcherOutputText  (Div that patcher output text is printed to)
- patcherApplyButton (The "Apply Patch" button)
- patcherSaveAncDiv (The div holding the save anchor)
-  patcherSaveAnchor (The "Click here to Save" anchor)
+patcherContainer         (The div which all subsequent elements are appended to)
+ patcherLoadDiv          (Div containing the "Browse" input/button)
+  patcherLoadInput       (The "Browse" file selection input)
+ patcherDialogueDiv      (Div containing the dialogue selection dropdown)
+  patcherDialogureSelect (Dialogue select)
+ patcherOutputText       (Div that patcher output text is printed to)
+ patcherApplyButton      (The "Apply Patch" button)
+ patcherSaveAncDiv       (The div holding the save anchor)
+  patcherSaveAnchor      (The "Click here to Save" anchor)
 
 */
 
@@ -26,17 +29,29 @@ patcherContainer (The div which all subsequent elements are appended to)
 }
 
 
-.patcherLoadInput /* The "Browse..." file selection button */
+.patcherLoadDiv /* Div containg the "Browse..." file input/button */
 {
-	/* Note: This is actually an "input" element, not a "button" element */
+
+}
+
+
+.patcherLoadInput /* The "Browse..." file selection input/button */
+{
+	/* Note: This is an "input" element, not a "button" element! */
 
 	font-family: monospace;
 }
 
 
-.patcherGameTextSelect /* The dropdown used to select game text version (e.i. Clean New World toggle) */
+.patcherDialogueDiv /* Div containg the dialogue selection dropdown */
 {
-	display: block;
+
+}
+
+
+.patcherDialogueSelect /* The dialogue selection dropdown */
+{
+
 }
 
 
@@ -60,9 +75,9 @@ patcherContainer (The div which all subsequent elements are appended to)
 }
 
 
-.patcherSaveAnchor /* The "Click here to Save" button */
+.patcherSaveAnchor /* The "Click here to Save" anchor */
 {
-	/* Note: This is actually an "a" element, not a "button" element */
+	/* Note: This is an "a" element, not a "button" element! */
 
 	background-color: #dfd;
 	border: 1px solid #888;
