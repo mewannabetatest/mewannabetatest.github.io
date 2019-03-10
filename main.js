@@ -1,23 +1,16 @@
 "use strict";
 
-function main(div)
+function main(outerDiv)
 {
+	// Container div
+	var div = document.createElement("div");
+	div.className = "patcherContainer";
 
-	div.style.fontFamily = "monospace";
-
-	// Top Text
-	div.appendChild(document.createTextNode("Upload a headered or unheadered FF3 ROM (.smc, .sfc, or .zip)"));
-
-	// File loader & status text
+	// File loader
 	var loadBut = document.createElement("input");
+	loadBut.className = "patcherLoadInput";
 	loadBut.type = "file";
-	var textDiv = document.createElement("div");
-	textDiv.style.height = "20px";
-	textDiv.innerHTML = "";
-	div.appendChild(document.createElement("br"));
-	div.appendChild(document.createElement("br"));
 	div.appendChild(loadBut);
-	div.appendChild(textDiv);
 	loadBut.addEventListener("change", function(e)
 	{
 		// Get file
@@ -38,7 +31,7 @@ function main(div)
 		{
 			var failhelp = "Make sure you're uploading a clean unpatched rom of Final Fantasy 3 US edition, versions 1.0 or 1.1";
 
-			// Get smc content
+			// Get smc content, check version, and activate the apply button
 			if(ext=="zip")
 			{
 				textDiv.innerHTML = "Examining zip contents...";
@@ -106,7 +99,6 @@ function main(div)
 
 			}
 
-			// Determine version and activate apply patch button (fail on checksum mismatch)
 			function getversion(bsmc)
 			{
 				if(bsmc.length==3146240) for(var i=0;i<512;i++) bsmc[i] = 0; // nullify header
@@ -139,26 +131,91 @@ function main(div)
 	});
 
 
+	// GAME TEXT DROPDOWN TODO
+	var gameTextSelect = document.createElement("select");
+	gameTextSelect.className = "patcherGameTextSelect";
+	(function()
+	{
+		function addOption(val, text)
+		{
+			var o = document.createElement("option");
+			o.value = val;
+			o.appendChild(document.createTextNode(text));
+			gameTextSelect.appendChild(o);
+		}
+
+		addOption("normal", "Brave New World");
+		addOption("clean", "Clean New World");
+		//addOption("vanilla", "Original Text");
+		div.appendChild(gameTextSelect);
+		// TODO on hover, have text explaining what the difference is
+		// TODO make name stylable... and it's options too? look up styling selects
+	})();
+
+
+	// Ouput Text
+	var textDiv = document.createElement("div");
+	textDiv.className = "patcherOutputText";
+	textDiv.innerHTML = "";
+	div.appendChild(textDiv);
+
+
 	// Apply Button
+	var applyBut = document.createElement("button");
+	applyBut.className = "patcherApplyButton";
+	applyBut.innerHTML = "Apply Patch";
+	applyBut.disabled = true;
+	div.appendChild(applyBut);
 	function activateApplyBut(bsmc, headered)
 	{
 		applyBut.disabled = false;
+
+		function makereq(filename, func)
+		{
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", filename,true);
+			xhr.responseType = "arraybuffer";
+			xhr.onload = function(e)
+			{
+				var arraybuffer = xhr.response;
+				if(arraybuffer) func(new Uint8Array(arraybuffer));
+				else console.log("XHR request failure");
+			};
+			xhr.send(null);
+		}
+
+		function generateZip(warn)
+		{
+			// Generate zip
+			var rmfn = "Readme.txt";
+			var pmfn = "Printme.xls";
+			var umfn = "Unlockme.rar";
+			textDiv.innerHTML = "Downloading and zipping files...";
+			makereq("attachments/"+rmfn,function(brm){ // TODO make these dl concurrently?
+			makereq("attachments/"+pmfn,function(bpm){ //  or dl these in advance??
+			makereq("attachments/"+umfn,function(bum)
+			{
+				var z = new JSZip();
+				z.file("BNW190.smc", bsmc);
+				z.file(rmfn, brm);
+				z.file(pmfn, bpm);
+				z.file(umfn, bum);
+				z.generateAsync({type:"blob"}).then(function(content)
+				{
+					try
+					{
+						if(warn) textDiv.innerHTML = "Checksum didn't match; you can try downloading the file but it might not work.  This shouldn't have happened..."
+						else     textDiv.innerHTML = "Patching complete!  DON'T LOAD THE ZIP DIRECTLY IN YOUR EMULATOR, it probably won't work!  Extract all the files from the zip, and load the .smc file in your emulator.";
+						genDownloadBut(content);
+					}
+					catch(e){ console.log(e);}
+				});
+
+			})})}); // TODO herp derp
+		}
+
 		applyBut.onclick = function()
 		{
-			function makereq(filename, func)
-			{
-				var xhr = new XMLHttpRequest();
-				xhr.open("GET", filename,true);
-				xhr.responseType = "arraybuffer";
-				xhr.onload = function(e)
-				{
-					var arraybuffer = xhr.response;
-					if(arraybuffer) func(new Uint8Array(arraybuffer));
-					else console.log("FUUUUUUUUUCK"); // TODO
-				};
-				xhr.send(null);
-			}
-
 			applyBut.disabled = true;
 			textDiv.innerHTML = "Downloading and Applying patch...";
 			var ipsfilename = headered?"patches/bnwh190.ips":"patches/bnwu190.ips";
@@ -177,58 +234,46 @@ function main(div)
 				else         var sum = "54427dfadea94ef32acd77be78137ac5";
 				if(checksum(bsmc)!=sum) warn = true;
 
-				// Generate zip
-				var rmfn = "Readme.txt";
-				var pmfn = "Printme.xls";
-				var umfn = "Unlockme.rar";
-				textDiv.innerHTML = "Downloading and zipping files...";
-				makereq("attachments/"+rmfn,function(brm){ // TODO make these dl concurrently?
-				makereq("attachments/"+pmfn,function(bpm){ //  or dl these in advance??
-				makereq("attachments/"+umfn,function(bum)
+				// Apply Clean New World if toggled, then Zip
+				console.log(gameTextSelect.value)
+				if(gameTextSelect.value=="clean")
 				{
-					var z = new JSZip();
-					z.file("BNW190.smc", bsmc);
-					z.file(rmfn, brm);
-					z.file(pmfn, bpm);
-					z.file(umfn, bum);
-					z.generateAsync({type:"blob"}).then(function(content)
+					applyBut.disabled = true;
+					textDiv.innerHTML = "Downloading and Applying Clean New World...";
+					var ipsfilename = headered?"patches/cnwh190.ips":"patches/cnwu190.ips";
+					makereq(ipsfilename, function(bips)
 					{
-						try
+						// Apply ips to loaded smc file (break on failure)
+						if(!applyIps(bsmc, bips))
 						{
-							if(warn) textDiv.innerHTML = "Checksum didn't match; you can try downloading the file but it might not work.  This shouldn't have happened..."
-							else     textDiv.innerHTML = "Patching complete!  DON'T LOAD THE ZIP DIRECTLY IN YOUR EMULATOR, it probably won't work!  Extract all the files from the zip, and load the .smc file in your emulator.";
-							genDownloadBut(content);
+							alert("CNW applyIps failed");
+							return;
 						}
-						catch(e){ console.log(e);}
-					});
 
-				})})}); // TODO herp derp
+						generateZip(warn);
+					});
+				}
+				else
+				{
+					generateZip(warn);
+				}
 
 			});
+
 		}
 	}
-	var applyBut = document.createElement("button");
-	applyBut.innerHTML = "Apply Patch";
-	applyBut.disabled = true;
-	div.appendChild(document.createElement("br"));
-	div.appendChild(applyBut);
 
 
 	// Download Button
 	var downloadDiv = document.createElement("div");
-	downloadDiv.style.height = "50px";
-	div.appendChild(document.createElement("br"));
-	div.appendChild(document.createElement("br"));
+	downloadDiv.className = "patcherDownloadAncDiv";
 	div.appendChild(downloadDiv)
 	function genDownloadBut(blob)
 	{
 		downloadDiv.innerHTML = "";
 		var downloadAnc = document.createElement("a");
+		downloadAnc.className = "patcherDownloadAnchor";
 		downloadAnc.href = "";
-		downloadAnc.style.backgroundColor = "#dfd";
-		downloadAnc.style.border = "1px solid #888";
-		downloadAnc.style.borderRadius = "5px";
-		downloadAnc.style.padding = "5px";
 		downloadAnc.innerHTML = "Click here to download";
 		downloadDiv.appendChild(downloadAnc);
 		downloadDiv.addEventListener("mousedown", function() // TODO is mousedown ghetto here??
@@ -239,5 +284,7 @@ function main(div)
 		});
 	}
 
+	// Append to DOM
+	outerDiv.appendChild(div);
 
 }

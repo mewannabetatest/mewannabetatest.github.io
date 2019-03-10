@@ -1,0 +1,73 @@
+/*
+
+DOM structure:
+The "main" function injects this DOM structure into the element it's
+ passed, in the following order:
+
+patcherContainer (The div which all subsequent elements are appended to)
+ patcherLoadInput (the "Browse" file selection input)
+ patcherOutputText  (Div that patcher output text is printed to)
+ patcherApplyButton (The "Apply Patch" button)
+ patcherDownloadAncDiv (The div holding the download anchor)
+  patcherDownloadAnchor (The "Click here to Download" anchor)
+
+*/
+
+
+
+.patcherContainer /* The root div in the DOM */
+{
+	font-family: monospace;
+	width: 500px;
+	margin: 0 auto;
+	padding:  5px;
+	border: 1px solid #DDD;
+	border-radius: 5px;
+}
+
+
+.patcherLoadInput /* The "Browse..." file selection button */
+{
+	/* Note: This is actually an "input" element, not a "button" element */
+
+	font-family: monospace;
+}
+
+
+.patcherGameTextSelect /* The dropdown used to select game text version (e.i. Clean New World toggle) */
+{
+	display: block;
+}
+
+
+.patcherOutputText  /* Div that patcher output text is printed to */
+{
+	margin-top: 10px;
+	height: 50px; /* Constant height, so changing the text doesn't change div's height */
+}
+
+
+.patcherApplyButton /* The "Apply Patch" button */
+{
+
+}
+
+
+.patcherDownloadAncDiv /* The div holding the download anchor */
+{
+	height: 30px; /* Constant height, so adding the Download Anchor doesn't change div's height */
+	margin-top: 20px;
+}
+
+
+.patcherDownloadAnchor /* The "Click here to Download" button */
+{
+	/* Note: This is actually an "a" element, not a "button" element */
+
+	background-color: #dfd;
+	border: 1px solid #888;
+	border-radius: 5px;
+	padding: 5px;
+}
+
+
